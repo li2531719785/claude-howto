@@ -1,62 +1,88 @@
-# CLAUDE.md
+# 项目配置
 
-Tutorial repo. Output is markdown in numbered modules `01-` through `10-`, not an app. Scripts in `scripts/` exist only to validate docs and build the EPUB.
+## 项目概览
+- **名称**：电商平台
+- **技术栈**：Node.js、PostgreSQL、React 18、Docker
+- **团队规模**：5 名开发者
+- **截止时间**：2025 年第 4 季度
 
-See also `.claude/CLAUDE.md` for stack/commands and `STYLE_GUIDE.md` for lesson structure.
+## 架构
+@docs/architecture.md
+@docs/api-standards.md
+@docs/database-schema.md
 
-## Critical commands
+## 开发规范
 
-```bash
-# Quality gate (also runs on commit via pre-commit hooks)
-pre-commit run --all-files
+### 代码风格
+- 使用 Prettier 格式化
+- 使用带 airbnb 配置的 ESLint
+- 最大行长度：100 字符
+- 使用 2 空格缩进
 
-# Tests
-pytest scripts/tests/ -v
+### 命名规范
+- **文件**：kebab-case（`user-controller.js`）
+- **类**：PascalCase（`UserService`）
+- **函数 / 变量**：camelCase（`getUserById`）
+- **常量**：UPPER_SNAKE_CASE（`API_BASE_URL`）
+- **数据库表**：snake_case（`user_accounts`）
 
-# EPUB build (calls Kroki.io API to render Mermaid — needs network)
-uv run scripts/build_epub.py
+### Git 工作流
+- 分支命名：`feature/description` 或 `fix/description`
+- 提交信息：遵循 conventional commits
+- 合并前必须有 PR
+- 所有 CI/CD 检查都必须通过
+- 至少需要 1 个 approval
 
-# Python tooling
-ruff check scripts/ && ruff format scripts/
-mypy scripts/ --ignore-missing-imports
-bandit -c scripts/pyproject.toml -r scripts/ --exclude scripts/tests/
-```
+### 测试要求
+- 最低 80% 代码覆盖率
+- 所有关键路径都必须有测试
+- 单元测试使用 Jest
+- E2E 测试使用 Cypress
+- 测试文件名：`*.test.ts` 或 `*.spec.ts`
 
-Pre-commit runs 5 checks: markdown-lint, cross-references, mermaid-syntax, link-check, build-epub (on `.md` changes). All must pass.
+### API 规范
+- 只允许 RESTful 端点
+- 请求 / 响应都使用 JSON
+- 正确使用 HTTP 状态码
+- API 版本路径：`/api/v1/`
+- 所有端点都要带示例文档
 
-## Architecture map
+### 数据库
+- schema 变更使用 migrations
+- 绝不硬编码凭据
+- 使用连接池
+- 开发环境启用查询日志
+- 需要定期备份
 
-- `01-` … `10-` — tutorial modules. **Numbered prefix = learning order**, not alphabetical. Do not reorganize.
-- Each module: `README.md` + copy-paste templates (`.md`, `.json`, `.sh`).
-- `scripts/` — utilities (EPUB builder, link/mermaid/cross-ref validators). Not the product.
-- `02-memory/*.md` — CLAUDE.md templates users copy into their own projects. Don't confuse with this file.
-- `openspec/` — spec-driven change proposals.
+### 部署
+- 基于 Docker 的部署
+- 使用 Kubernetes 编排
+- 蓝绿部署策略
+- 失败时自动回滚
+- 部署前先执行数据库迁移
 
-## Hard rules
+## 常用命令
 
-- **YOU MUST NOT commit or push without explicit user request.**
-- **YOU MUST NOT add `Co-Authored-By: Claude`** to any commit message.
-- Always activate `.venv` before running Python scripts (check `venv/`, `.venv/`, `env/`).
-- Internal links use **relative paths** (e.g. `01-slash-commands/README.md`); anchors use `#heading-name`.
-- Code fences **must** declare a language (`bash`, `python`, `json`, …) — the cross-reference check fails otherwise.
-- External URLs must be reachable and stable. No ephemeral links.
-- Mermaid diagrams must parse (validated pre-commit). Broken EPUB build is usually invalid Mermaid or no network to Kroki.
-- Commit format: `type(scope): subject` where `scope` matches the module folder (e.g. `feat(slash-commands):`, `docs(memory):`, `fix(README):`).
-- Do not reorganize the `01-`–`10-` numbering. The order is the curriculum.
+| 命令 | 作用 |
+|---------|---------|
+| `npm run dev` | 启动开发服务器 |
+| `npm test` | 运行测试套件 |
+| `npm run lint` | 检查代码风格 |
+| `npm run build` | 构建生产版本 |
+| `npm run migrate` | 执行数据库迁移 |
 
-## Workflow preferences
+## 团队联系人
+- 技术负责人：Sarah Chen（@sarah.chen）
+- 产品经理：Mike Johnson（@mike.j）
+- 运维：Alex Kim（@alex.k）
 
-- For lesson edits, follow `STYLE_GUIDE.md` for structure/naming/diagrams.
-- Small fixes → minimal diff. Don't rewrite a section to fix a typo.
-- When adding a module page: README + templates first, then update root `README.md` index and `LEARNING-ROADMAP.md` if order/timing changes.
-- Tutorial > library: prioritize clear explanations and copy-paste examples over reusable abstractions.
-- If a quality check fails, fix the underlying issue. Don't bypass with `--no-verify`.
+## 已知问题与解决方案
+- PostgreSQL 连接池在高峰期限制为 20
+- 解决方法：实现查询排队
+- Safari 14 对 async generator 的兼容性有问题
+- 解决方法：使用 Babel 转译器
 
-## Token Efficiency
-- Never re-read files you just wrote or edited. You know the contents.
-- Never re-run commands to "verify" unless the outcome was uncertain.
-- Don't echo back large blocks of code or file contents unless asked.
-- Batch related edits into single operations. Don't make 5 edits when 1 handles it.
-- Skip confirmations like "I'll continue..." Just do it.
-- If a task needs 1 tool call, don't use 3. Plan before acting.
-- Do not summarize what you just did unless the result is ambiguous or you need additional input.
+## 关联项目
+- 分析仪表盘：`/projects/analytics`
+- 移动端 App：`/projects/mobile`
+- 管理后台：`/projects/admin`
